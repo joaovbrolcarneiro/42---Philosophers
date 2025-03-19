@@ -6,7 +6,7 @@
 /*   By: jbrol-ca <jbrol-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/16 10:00:00 by jbrol-ca          #+#    #+#             */
-/*   Updated: 2025/03/19 16:00:05 by jbrol-ca         ###   ########.fr       */
+/*   Updated: 2025/03/19 19:53:51 by jbrol-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,19 @@
 
 int	check_death(t_data *data, int i)
 {
+	long long	now;
+
 	pthread_mutex_lock(&data->eating);
-	if (get_time() - data->philosophers[i].last_meal > data->time_to_die)
+	now = get_time();
+	if (now - data->philosophers[i].last_meal > data->time_to_die)
 	{
 		pthread_mutex_lock(&data->printing);
-		printf("%lld %d died\n",
-			get_time() - data->start_time, data->philosophers[i].id);
-		data->philo_died = 1;
+		if (!data->philo_died)
+		{
+			printf("%lld %d died\n", now - data->start_time, 
+				data->philosophers[i].id);
+			data->philo_died = 1;
+		}
 		pthread_mutex_unlock(&data->printing);
 		pthread_mutex_unlock(&data->eating);
 		return (1);
