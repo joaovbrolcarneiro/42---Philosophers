@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jbrol-ca <jbrol-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/16 10:00:00 by                   #+#    #+#             */
-/*   Updated: 2025/02/16 14:37:29 by jbrol-ca         ###   ########.fr       */
+/*   Created: 2024/02/16 10:00:00 by jbrol-ca          #+#    #+#             */
+/*   Updated: 2025/03/19 15:59:56 by jbrol-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static void	free_data(t_data *data)
 	int	i;
 
 	i = 0;
-	while (i < data->number_of_philosophers)
+	while (i < data->nbr_of_philosophers)
 	{
 		pthread_mutex_destroy(&data->forks[i]);
 		i++;
@@ -36,7 +36,7 @@ static int	create_threads(t_data *data)
 
 	i = 0;
 	data->start_time = get_time();
-	while (i < data->number_of_philosophers)
+	while (i < data->nbr_of_philosophers)
 	{
 		data->philosophers[i].last_meal = data->start_time;
 		if (pthread_create(&data->philosophers[i].thread, NULL,
@@ -52,18 +52,31 @@ static void	join_threads(t_data *data)
 	int	i;
 
 	i = 0;
-	while (i < data->number_of_philosophers)
+	while (i < data->nbr_of_philosophers)
 	{
 		pthread_join(data->philosophers[i].thread, NULL);
 		i++;
 	}
 }
 
+static int	run_simulation(t_data *data)
+{
+	if (create_threads(data))
+	{
+		free_data(data);
+		return (1);
+	}
+	monitor_philosophers(data);
+	join_threads(data);
+	free_data(data);
+	return (0);
+}
+
 int	main(int argc, char **argv)
 {
 	t_data	data;
 
-	if (argc != 5)
+	if (argc != 5 && argc != 6)
 	{
 		printf("Error: wrong number of arguments\n");
 		return (1);
@@ -80,13 +93,5 @@ int	main(int argc, char **argv)
 		free_data(&data);
 		return (1);
 	}
-	if (create_threads(&data))
-	{
-		free_data(&data);
-		return (1);
-	}
-	monitor_philosophers(&data);
-	join_threads(&data);
-	free_data(&data);
-	return (0);
+	return (run_simulation(&data));
 }

@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jbrol-ca <jbrol-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/16 10:00:00 by                   #+#    #+#             */
-/*   Updated: 2025/02/16 14:38:11 by jbrol-ca         ###   ########.fr       */
+/*   Created: 2024/02/16 10:00:00 by jbrol-ca          #+#    #+#             */
+/*   Updated: 2025/03/19 16:00:05 by jbrol-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,28 @@ int	check_death(t_data *data, int i)
 	return (0);
 }
 
+int	all_philosophers_ate_enough(t_data *data)
+{
+	int	i;
+	int	finished;
+
+	if (data->meals_required < 0)
+		return (0);
+	i = 0;
+	finished = 1;
+	while (i < data->nbr_of_philosophers)
+	{
+		pthread_mutex_lock(&data->eating);
+		if (data->philosophers[i].meals_eaten < data->meals_required)
+			finished = 0;
+		pthread_mutex_unlock(&data->eating);
+		if (!finished)
+			break ;
+		i++;
+	}
+	return (finished);
+}
+
 void	monitor_philosophers(t_data *data)
 {
 	int	i;
@@ -36,7 +58,14 @@ void	monitor_philosophers(t_data *data)
 	while (!data->philo_died)
 	{
 		i = 0;
-		while (i < data->number_of_philosophers && !data->philo_died)
+		if (all_philosophers_ate_enough(data))
+		{
+			pthread_mutex_lock(&data->printing);
+			data->philo_died = 1;
+			pthread_mutex_unlock(&data->printing);
+			return ;
+		}
+		while (i < data->nbr_of_philosophers && !data->philo_died)
 		{
 			if (check_death(data, i))
 				return ;

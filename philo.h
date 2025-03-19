@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jbrol-ca <jbrol-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/16 10:00:00 by                   #+#    #+#             */
-/*   Updated: 2025/02/16 14:37:21 by jbrol-ca         ###   ########.fr       */
+/*   Created: 2024/02/16 10:00:00 by jbrol-ca          #+#    #+#             */
+/*   Updated: 2025/03/19 15:56:34 by jbrol-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,10 +34,11 @@ typedef struct s_philo
 
 typedef struct s_data
 {
-	int				number_of_philosophers;
+	int				nbr_of_philosophers;
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
+	int				meals_required;
 	int				philo_died;
 	long long		start_time;
 	pthread_mutex_t	*forks;
@@ -64,5 +65,6 @@ void		eating(t_philo *philo);
 /* monitor.c */
 int			check_death(t_data *data, int i);
 void		monitor_philosophers(t_data *data);
+int			all_philosophers_ate_enough(t_data *data);
 
 #endif
